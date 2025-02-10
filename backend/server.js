@@ -22,6 +22,7 @@ const app = express();
 // Security Middlewares
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true,}));
+console.log('CLIENT_URL:', process.env.CLIENT_URL);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
