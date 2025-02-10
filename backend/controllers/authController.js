@@ -28,19 +28,52 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+// const verifyOTPAndLogin = async (req, res) => {
+//   try {
+//     const { email, otp } = req.body;
+//     let clientIp = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+//     // Normalize localhost IP
+//     if (clientIp === '::1' || clientIp === '127.0.0.1') {
+//       clientIp = '127.0.0.1'; // Use IPv4 loopback for consistency
+//     } else {
+//       // Fetch public IP for non-localhost environments
+//       const publicIpResponse = await axios.get('https://api.ipify.org?format=json');
+//       clientIp = publicIpResponse.data.ip;
+//     }
+
+//     if (!verifyOTP(email, otp)) {
+//       return res.status(400).json({ message: 'Invalid or expired OTP' });
+//     }
+
+//     const admin = await Admin.findOne({ email });
+//     if (!admin) return res.status(401).json({ message: "Invalid email or password" });
+
+//     const sessionId = crypto.randomBytes(16).toString('hex');
+//     const csrfToken = crypto.randomBytes(32).toString('hex');
+
+//     const accessToken = jwt.sign({ userId: admin._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+//     const refreshToken = jwt.sign({ userId: admin._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+//     // Store session with IP address
+//     await Session.create({ userId: admin._id, sessionId, csrfToken, ipAddress: clientIp });
+
+//     res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+//     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+//     res.cookie('sessionId', sessionId, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+
+//     res.status(200).json({ message: "Login successful", csrfToken });
+//   } catch (error) {
+//     console.error('OTP Verification Error:', error);
+//     res.status(500).json({ message: 'Error verifying OTP' });
+//   }
+// };
+
+
 const verifyOTPAndLogin = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    let clientIp = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
-    // Normalize localhost IP
-    if (clientIp === '::1' || clientIp === '127.0.0.1') {
-      clientIp = '127.0.0.1'; // Use IPv4 loopback for consistency
-    } else {
-      // Fetch public IP for non-localhost environments
-      const publicIpResponse = await axios.get('https://api.ipify.org?format=json');
-      clientIp = publicIpResponse.data.ip;
-    }
+    let clientIp = req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.connection.remoteAddress;
 
     if (!verifyOTP(email, otp)) {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
@@ -55,7 +88,7 @@ const verifyOTPAndLogin = async (req, res) => {
     const accessToken = jwt.sign({ userId: admin._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ userId: admin._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-    // Store session with IP address
+    // Store session with the correct IP address
     await Session.create({ userId: admin._id, sessionId, csrfToken, ipAddress: clientIp });
 
     res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
@@ -68,6 +101,7 @@ const verifyOTPAndLogin = async (req, res) => {
     res.status(500).json({ message: 'Error verifying OTP' });
   }
 };
+
 
 const registerAdmin = async (req, res) => {
   try {
