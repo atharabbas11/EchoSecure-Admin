@@ -30,32 +30,66 @@ router.get('/csrf-token', async (req, res) => {
 });
 
 // Check Auth Status
+// router.get('/check-auth', async (req, res) => {
+//     try {
+//       const { accessToken, sessionId } = req.cookies;
+//       console.log('Cookies:', req.cookies); // Debugging
+//       if (!accessToken || !sessionId) {
+//         console.log('Missing accessToken or sessionId'); // Debugging
+//         return res.status(401).json({ authenticated: false });
+//       }
+  
+//       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET); // Fix: jwt is now defined
+//       console.log('Decoded Token:', decoded); // Debugging
+  
+//       const session = await Session.findOne({ userId: decoded.userId, sessionId });
+//       console.log('Session from DB:', session); // Debugging
+
+//       if (!session) {
+//         console.log('Invalid session'); // Debugging
+//         return res.status(401).json({ authenticated: false });
+//       }
+  
+//       res.status(200).json({ authenticated: true });
+//     } catch (error) {
+//       console.error('Check Auth Error:', error); // Debugging
+//       res.status(401).json({ authenticated: false });
+//     }
+// });
+
 router.get('/check-auth', async (req, res) => {
     try {
-      const { accessToken, sessionId } = req.cookies;
-      console.log('Cookies:', req.cookies); // Debugging
-      if (!accessToken || !sessionId) {
-        console.log('Missing accessToken or sessionId'); // Debugging
-        return res.status(401).json({ authenticated: false });
-      }
-  
-      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET); // Fix: jwt is now defined
-      console.log('Decoded Token:', decoded); // Debugging
-  
-      const session = await Session.findOne({ userId: decoded.userId, sessionId });
-      console.log('Session from DB:', session); // Debugging
+        const { accessToken, sessionId } = req.cookies;
+        console.log('Cookies:', req.cookies); // Debugging
 
-      if (!session) {
-        console.log('Invalid session'); // Debugging
-        return res.status(401).json({ authenticated: false });
-      }
-  
-      res.status(200).json({ authenticated: true });
+        if (!accessToken || !sessionId) {
+            console.log('Missing accessToken or sessionId'); // Debugging
+            return res.status(401).json({ authenticated: false });
+        }
+
+        try {
+            const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+            console.log('Decoded Token:', decoded); // Debugging
+
+            const session = await Session.findOne({ userId: decoded.userId, sessionId });
+            console.log('Session from DB:', session); // Debugging
+
+            if (!session) {
+                console.log('Invalid session'); // Debugging
+                return res.status(401).json({ authenticated: false });
+            }
+
+            res.status(200).json({ authenticated: true });
+        } catch (jwtError) {
+            console.error("JWT Verification Failed:", jwtError);
+            return res.status(401).json({ authenticated: false });
+        }
     } catch (error) {
-      console.error('Check Auth Error:', error); // Debugging
-      res.status(401).json({ authenticated: false });
+        console.error('Check Auth Error:', error);
+        res.status(401).json({ authenticated: false });
     }
 });
+
   
 router.post('/login', loginAdmin);
 router.post('/register', registerAdmin);
