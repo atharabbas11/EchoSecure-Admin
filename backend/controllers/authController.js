@@ -51,12 +51,12 @@ const verifyOTPAndLogin = async (req, res) => {
     if (!isOTPValid || admin.otpExpires < Date.now()) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }    
-    
+
     // Clear OTP after successful verification
     admin.otp = null;
     admin.otpExpires = null;
     await admin.save();
-    
+
     // const admin = await Admin.findOne({ email });
     if (!admin) return res.status(401).json({ message: "Invalid email or password" });
 
