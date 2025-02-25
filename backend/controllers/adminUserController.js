@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendPasswordSetupEmail } from '../service/otpService.js';
 
+const CLIENT_URL = process.env.CLIENT_URL;
+
 // Get all users (admin only)
 const getAllUsers = async (req, res) => {
   try {
@@ -56,7 +58,7 @@ const createUser = async (req, res) => {
     await newUser.save();
 
     // Send email with password setup link
-    const passwordSetupLink = `http://192.168.1.137:5173/set-password?token=${passwordSetupToken}`;
+    const passwordSetupLink = `${CLIENT_URL}/set-password?token=${passwordSetupToken}`;
     await sendPasswordSetupEmail(email, passwordSetupLink);
 
     res.status(201).json({
