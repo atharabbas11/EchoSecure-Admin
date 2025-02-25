@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import axios from 'axios';
-import { generateOTP, storeOTP, verifyOTP, sendOTPEmail } from '../service/otpService.js';
+import { generateOTP, storeOTP, sendOTPEmail } from '../service/otpService.js';
 
 const loginAdmin = async (req, res) => {
   try {
@@ -18,8 +18,8 @@ const loginAdmin = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid email or password" });
 
     // Generate and send OTP
-    const otp = generateOTP();
-    storeOTP(email, otp);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+    await admin.encryptOTP(otp); // Encrypt and store OTP
     await sendOTPEmail(email, otp);
 
     res.status(200).json({ message: "OTP sent to your email" });
@@ -32,6 +32,9 @@ const loginAdmin = async (req, res) => {
 const verifyOTPAndLogin = async (req, res) => {
   try {
     const { email, otp } = req.body;
+
+    const admin = await Admin.findOne({ email });
+
     let clientIp = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
     // Normalize localhost IP
@@ -43,11 +46,13 @@ const verifyOTPAndLogin = async (req, res) => {
       clientIp = publicIpResponse.data.ip;
     }
 
-    if (!verifyOTP(email, otp)) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
+    // Verify OTP
+    const isOTPValid = await admin.verifyOTP(otp);
+    if (!isOTPValid || admin.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }    
 
-    const admin = await Admin.findOne({ email });
+    // const admin = await Admin.findOne({ email });
     if (!admin) return res.status(401).json({ message: "Invalid email or password" });
 
     const sessionId = crypto.randomBytes(16).toString('hex');
