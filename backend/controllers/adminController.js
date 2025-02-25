@@ -11,7 +11,7 @@ const getAdminStats = async (req, res) => {
 
     const latestUsers = await User.find()
       .sort({ createdAt: -1 })
-      .limit(5)
+      .limit(100)
       .select('profilePic fullName email createdAt');
 
     console.log("Latest Users:", latestUsers); // Debugging log
