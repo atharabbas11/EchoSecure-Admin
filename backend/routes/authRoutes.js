@@ -30,66 +30,50 @@ router.get('/csrf-token', async (req, res) => {
 });
 
 // Check Auth Status
-// router.get('/check-auth', async (req, res) => {
-//     try {
-//       const { accessToken, sessionId } = req.cookies;
-//       console.log('Cookies:', req.cookies); // Debugging
-//       if (!accessToken || !sessionId) {
-//         console.log('Missing accessToken or sessionId'); // Debugging
-//         return res.status(401).json({ authenticated: false });
-//       }
-  
-//       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET); // Fix: jwt is now defined
-//       console.log('Decoded Token:', decoded); // Debugging
-  
-//       const session = await Session.findOne({ userId: decoded.userId, sessionId });
-//       console.log('Session from DB:', session); // Debugging
-
-//       if (!session) {
-//         console.log('Invalid session'); // Debugging
-//         return res.status(401).json({ authenticated: false });
-//       }
-  
-//       res.status(200).json({ authenticated: true });
-//     } catch (error) {
-//       console.error('Check Auth Error:', error); // Debugging
-//       res.status(401).json({ authenticated: false });
-//     }
-// });
-
 router.get('/check-auth', async (req, res) => {
     try {
-        const { accessToken, sessionId } = req.cookies;
-        console.log('Cookies:', req.cookies); // Debugging
+      const { accessToken, sessionId } = req.cookies;
+      console.log('Cookies:', req.cookies); // Debugging
+      if (!accessToken || !sessionId) {
+        console.log('Missing accessToken or sessionId'); // Debugging
+        return res.status(401).json({ authenticated: false });
+      }
+  
+      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET); // Fix: jwt is now defined
+      console.log('Decoded Token:', decoded); // Debugging
+  
+      const session = await Session.findOne({ userId: decoded.userId, sessionId });
+      console.log('Session from DB:', session); // Debugging
 
-        if (!accessToken || !sessionId) {
-            console.log('Missing accessToken or sessionId'); // Debugging
-            return res.status(401).json({ authenticated: false });
-        }
-
-        try {
-            const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-            console.log('Decoded Token:', decoded); // Debugging
-
-            const session = await Session.findOne({ userId: decoded.userId, sessionId });
-            console.log('Session from DB:', session); // Debugging
-
-            if (!session) {
-                console.log('Invalid session'); // Debugging
-                return res.status(401).json({ authenticated: false });
-            }
-
-            res.status(200).json({ authenticated: true });
-        } catch (jwtError) {
-            console.error("JWT Verification Failed:", jwtError);
-            return res.status(401).json({ authenticated: false });
-        }
+      if (!session) {
+        console.log('Invalid session'); // Debugging
+        return res.status(401).json({ authenticated: false });
+      }
+  
+      res.status(200).json({ authenticated: true });
     } catch (error) {
-        console.error('Check Auth Error:', error);
-        res.status(401).json({ authenticated: false });
+      console.error('Check Auth Error:', error); // Debugging
+      res.status(401).json({ authenticated: false });
     }
 });
 
+router.post('/refresh-token', async (req, res) => {
+  try {
+      const { refreshToken } = req.cookies;
+      if (!refreshToken) {
+          return res.status(401).json({ message: 'No refresh token provided' });
+      }
+
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      const newAccessToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+      res.cookie('accessToken', newAccessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+
+      return res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+      return res.status(401).json({ message: 'Invalid refresh token, please log in again' });
+  }
+});
   
 router.post('/login', loginAdmin);
 router.post('/register', registerAdmin);
