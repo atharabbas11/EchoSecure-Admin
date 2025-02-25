@@ -67,10 +67,11 @@ const Home = () => {
       {stats.latestUsers && stats.latestUsers.length > 0 ? (
         <div className="mt-8">
           <h2 className="text-2xl font-semibold mb-4">Latest Users</h2>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 justify-between">
             {stats.latestUsers.map((user) => (
-              <div key={user._id} className="flex items-center bg-white p-4 rounded-lg shadow-md w-60">
-                <Avatar src={user.profilePic} alt={user.fullName} className="w-12 h-12 mr-4" />
+              <div key={user._id} className="flex items-center bg-white p-4 rounded-lg shadow-md w-80">
+                <Avatar src={user.profilePic} alt={user.fullName} className="w-12 h-12 mr-4 rounded"/>
+                {console.log(user.profilePic)}
                 <div>
                   <p className="text-sm font-medium">{user.fullName}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
