@@ -56,7 +56,7 @@ const createUser = async (req, res) => {
     await newUser.save();
 
     // Send email with password setup link
-    const passwordSetupLink = `http://localhost:5173/set-password?token=${passwordSetupToken}`;
+    const passwordSetupLink = `http://192.168.1.137:5173/set-password?token=${passwordSetupToken}`;
     await sendPasswordSetupEmail(email, passwordSetupLink);
 
     res.status(201).json({
