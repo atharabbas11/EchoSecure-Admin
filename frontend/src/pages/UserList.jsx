@@ -23,7 +23,7 @@ const UsersList = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get("/api/users", { withCredentials: true });
+      const response = await apiClient.get("/users", { withCredentials: true });
       setUsers(response.data);
     } catch (error) {
       setSnackbar({ open: true, message: "Failed to fetch users", severity: "error" });
@@ -39,7 +39,7 @@ const UsersList = () => {
 
   const handleCreateUser = async () => {
     try {
-      const response = await apiClient.post("/api/users", { ...newUser, password: undefined }, { withCredentials: true });
+      const response = await apiClient.post("/users", { ...newUser, password: undefined }, { withCredentials: true });
       setUsers([...users, response.data]);
       setSnackbar({ open: true, message: "User created successfully", severity: "success" });
       setOpenDialog(false);
@@ -51,7 +51,7 @@ const UsersList = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      await apiClient.delete(`/api/users/${id}`, { withCredentials: true });
+      await apiClient.delete(`/users/${id}`, { withCredentials: true });
       setUsers(users.filter((user) => user._id !== id));
       setSnackbar({ open: true, message: "User deleted successfully", severity: "success" });
     } catch (error) {

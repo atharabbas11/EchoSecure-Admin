@@ -56,6 +56,24 @@ router.get('/check-auth', async (req, res) => {
       res.status(401).json({ authenticated: false });
     }
 });
+
+router.post('/refresh-token', async (req, res) => {
+  try {
+      const { refreshToken } = req.cookies;
+      if (!refreshToken) {
+          return res.status(401).json({ message: 'No refresh token provided' });
+      }
+
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      const newAccessToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+      res.cookie('accessToken', newAccessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+
+      return res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+      return res.status(401).json({ message: 'Invalid refresh token, please log in again' });
+  }
+});
   
 router.post('/login', loginAdmin);
 router.post('/register', registerAdmin);
