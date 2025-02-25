@@ -30,7 +30,6 @@ const Navbar = () => {
         { text: 'Logout', action: handleLogout, icon: <FaSignOutAlt />, color: 'text-red-500' },
       ]
     : [
-        { text: 'Home', to: '/', icon: <FaHome /> },
         { text: 'Login', to: '/login', icon: <FaSignInAlt /> },
       ];
 
