@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendPasswordSetupEmail } from '../service/otpService.js';
 
-const CLIENT_URL = process.env.ECHOSECURE_CLIENT_URL;
+const ECHOSECURE_CLIENT_URL = process.env.ECHOSECURE_CLIENT_URL;
 
 // Get all users (admin only)
 const getAllUsers = async (req, res) => {
