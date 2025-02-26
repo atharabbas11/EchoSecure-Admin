@@ -69,9 +69,9 @@ const verifyOTPAndLogin = async (req, res) => {
     // Store session with IP address
     await Session.create({ userId: admin._id, sessionId, csrfToken, ipAddress: clientIp });
 
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
-    res.cookie('sessionId', sessionId, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' });
+    res.cookie('sessionId', sessionId, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' });
 
     res.status(200).json({ message: "Login successful", csrfToken });
   } catch (error) {
