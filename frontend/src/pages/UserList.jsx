@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../utils/apiClient";
 import { useNavigate } from "react-router-dom";
+import { FaUser } from "react-icons/fa";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -95,8 +96,10 @@ const UsersList = () => {
                   <td className="px-6 py-3">{user.fullName}</td>
                   <td className="px-6 py-3">{user.email}</td>
                   <td className="px-6 py-3">
-                    {user.profilePic && (
+                    {user.profilePic ? (
                       <img src={user.profilePic} alt="Profile" className="w-12 h-12 rounded-full" />
+                    ) : (
+                      <FaUser className="w-12 h-12 text-gray-500 rounded-full" />
                     )}
                   </td>
                   <td className="px-6 py-3">
@@ -164,6 +167,7 @@ const UsersList = () => {
               value={newUser.password}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-4"
+              readOnly
             />
             <input
               type="text"
@@ -172,6 +176,7 @@ const UsersList = () => {
               value={newUser.profilePic}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-4"
+              readOnly
             />
             <select
               name="deleteOption"
