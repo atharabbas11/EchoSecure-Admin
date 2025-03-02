@@ -7,6 +7,7 @@ const Home = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // State to store search term
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -41,6 +42,12 @@ const Home = () => {
 
   if (!stats) return <h2 className="text-lg font-semibold">No data available</h2>;
 
+  // Filter users based on search term
+  const filteredUsers = stats.latestUsers.filter(user => 
+    user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-6">Admin Dashboard</h1>
@@ -65,6 +72,18 @@ const Home = () => {
 
       {stats.latestUsers && stats.latestUsers.length > 0 ? (
         <div className="mt-8">
+
+          {/* Search bar */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            />
+          </div>
+          
           <h2 className="text-2xl font-semibold mb-4">Latest Users</h2>
           <div className="flex flex-wrap gap-4 justify-between">
             {stats.latestUsers.map((user) => (
