@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../utils/apiClient";
-import { useNavigate } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 
 const UsersList = () => {
@@ -16,6 +15,7 @@ const UsersList = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [loading, setLoading] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState({ open: false, userId: null });
+  const [searchTerm, setSearchTerm] = useState(""); // State for the search term
 
   useEffect(() => {
     fetchUsers();
@@ -66,6 +66,12 @@ const UsersList = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  // Filter users based on search term
+  const filteredUsers = users.filter((user) =>
+    user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4">Users List</h1>
@@ -76,6 +82,17 @@ const UsersList = () => {
       >
         Add User
       </button>
+
+      {/* Search bar */}
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
 
       {loading ? (
         <p>Loading...</p>
@@ -91,27 +108,33 @@ const UsersList = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user._id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-3">{user.fullName}</td>
-                  <td className="px-6 py-3">{user.email}</td>
-                  <td className="px-6 py-3">
-                    {user.profilePic ? (
-                      <img src={user.profilePic} alt="Profile" className="w-12 h-12 rounded-full" />
-                    ) : (
-                      <FaUser className="w-12 h-12 text-gray-500 rounded-full" />
-                    )}
-                  </td>
-                  <td className="px-6 py-3">
-                    <button
-                      onClick={() => setDeleteConfirmation({ open: true, userId: user._id })}
-                      className="text-red-500"
-                    >
-                      Delete
-                    </button>
-                  </td>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user._id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-3">{user.fullName}</td>
+                    <td className="px-6 py-3">{user.email}</td>
+                    <td className="px-6 py-3">
+                      {user.profilePic ? (
+                        <img src={user.profilePic} alt="Profile" className="w-12 h-12 rounded-full" />
+                      ) : (
+                        <FaUser className="w-12 h-12 text-gray-500 rounded-full" />
+                      )}
+                    </td>
+                    <td className="px-6 py-3">
+                      <button
+                        onClick={() => setDeleteConfirmation({ open: true, userId: user._id })}
+                        className="text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-6 py-3 text-center text-gray-500">No users found</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -209,9 +232,7 @@ const UsersList = () => {
 
       {snackbar.open && (
         <div
-          className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md ${
-            snackbar.severity === "success" ? "bg-green-500" : "bg-red-500"
-          } text-white`}
+          className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md ${snackbar.severity === "success" ? "bg-green-500" : "bg-red-500"} text-white`}
         >
           {snackbar.message}
         </div>
@@ -221,3 +242,4 @@ const UsersList = () => {
 };
 
 export default UsersList;
+
