@@ -63,7 +63,7 @@ const verifyOTPAndLogin = async (req, res) => {
     const sessionId = crypto.randomBytes(16).toString('hex');
     const csrfToken = crypto.randomBytes(32).toString('hex');
 
-    const accessToken = jwt.sign({ userId: admin._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const accessToken = jwt.sign({ userId: admin._id }, process.env.JWT_SECRET, { expiresIn: '1m' });
     const refreshToken = jwt.sign({ userId: admin._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     // Store session with IP address
