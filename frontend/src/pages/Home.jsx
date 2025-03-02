@@ -16,8 +16,8 @@ const Home = () => {
         await fetchCsrfToken();
 
         // Get the CSRF token from Axios headers
-        // const csrfToken = apiClient.defaults.headers.common['X-CSRF-Token']; // Get CSRF token
-        // console.log('CSRF Token in Headers:', csrfToken); // Debugging log
+        const csrfToken = apiClient.defaults.headers.common['X-CSRF-Token']; // Get CSRF token
+        console.log('CSRF Token in Headers:', csrfToken); // Debugging log
     
         const response = await apiClient.get('/admin/stats', {
           withCredentials: true,
