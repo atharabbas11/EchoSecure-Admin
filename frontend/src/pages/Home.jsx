@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
-import { FaUsers, FaComment } from 'react-icons/fa';
-import Avatar from "react-avatar";
+import { FaUser, FaUsers, FaComment } from 'react-icons/fa';
 import { fetchCsrfToken } from '../utils/auth'; // Import fetchCsrfToken
 
 const Home = () => {
@@ -70,8 +69,12 @@ const Home = () => {
           <div className="flex flex-wrap gap-4 justify-between">
             {stats.latestUsers.map((user) => (
               <div key={user._id} className="flex items-center bg-white p-4 rounded-lg shadow-md w-80">
-                <Avatar src={user.profilePic} alt={user.fullName} className="w-12 h-12 mr-4 rounded"/>
-                {console.log(user.profilePic)}
+                {user.profilePic ? (
+                  <img src={user.profilePic} alt={user.fullName} className="w-12 h-12 mr-4 rounded" />
+                ) : (
+                  <FaUser className="w-12 h-12 mr-4 text-gray-500" />
+                )}
+{/*                 {console.log(user.profilePic)} */}
                 <div>
                   <p className="text-sm font-medium">{user.fullName}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
