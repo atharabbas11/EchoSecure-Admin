@@ -123,3 +123,5 @@ const updateUserEmail = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export { getAllUsers, createUser, deleteUser, updateUserEmail };
