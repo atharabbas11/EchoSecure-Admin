@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendPasswordSetupEmail } from '../service/otpService.js';
 
-const ES_CLIENT_URL = process.env.ES_CLIENT_URL;
+const ECHOSECURE_CLIENT_URL = process.env.ECHOSECURE_CLIENT_URL;
 
 // Get all users (admin only)
 const getAllUsers = async (req, res) => {
@@ -58,7 +58,7 @@ const createUser = async (req, res) => {
     await newUser.save();
 
     // Send email with password setup link
-    const passwordSetupLink = `${ES_CLIENT_URL}/set-password?token=${passwordSetupToken}`;
+    const passwordSetupLink = `${ECHOSECURE_CLIENT_URL}/set-password?token=${passwordSetupToken}`;
     await sendPasswordSetupEmail(email, passwordSetupLink);
 
     res.status(201).json({
@@ -90,4 +90,36 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getAllUsers, createUser, deleteUser };
+// Update user email (admin only)
+const updateUserEmail = async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Unauthorized: Admin access required" });
+    }
+
+    // Check if the new email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser._id.toString() !== id) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Update the user's email
+    const user = await User.findByIdAndUpdate(
+      id,
+      { email },
+      { new: true } // Return the updated user
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error updating email:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
