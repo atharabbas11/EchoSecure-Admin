@@ -1,303 +1,238 @@
-import React, { useState, useEffect } from "react";
-import apiClient from "../utils/apiClient";
-import { FaUser } from "react-icons/fa";
-import { CiEdit } from "react-icons/ci";
+import SessionUser from '../models/sessionUserModel.js';
+import SessionAdmin from '../models/sessionModel.js';
+import User from '../models/userModel.js';
+import Admin from '../models/adminModel.js';
+import Message from '../models/messageModel.js';
+import axios from 'axios';
 
-const UsersList = () => {
-  const [users, setUsers] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: "",
-    fullName: "",
-    password: "",
-    profilePic: "",
-    deleteOption: "off",
-  });
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const [loading, setLoading] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState({ open: false, userId: null });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editDialog, setEditDialog] = useState({ open: false, user: null, newEmail: "" }); // State for edit dialog
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get("/users", { withCredentials: true });
-      setUsers(response.data);
-    } catch (error) {
-      setSnackbar({ open: true, message: "Failed to fetch users", severity: "error" });
-    } finally {
-      setLoading(false);
+const getLocationFromIP = async (ip) => {
+  try {
+    const response = await axios.get(`http://ip-api.com/json/${ip}?fields=status,message,continent,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`);
+    if (response.data.status === 'success') {
+      return response.data;
+    } else {
+      console.error(`Error from ip-api.com: ${response.data.message}`);
+      return null;
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewUser({ ...newUser, [name]: value });
-  };
-
-  const handleCreateUser = async () => {
-    try {
-      const response = await apiClient.post("/users", { ...newUser, password: undefined }, { withCredentials: true });
-      setUsers([...users, response.data]);
-      setSnackbar({ open: true, message: "User created successfully", severity: "success" });
-      setOpenDialog(false);
-      setNewUser({ email: "", fullName: "", password: "", profilePic: "", deleteOption: "off" });
-    } catch (error) {
-      setSnackbar({ open: true, message: "Failed to create user", severity: "error" });
-    }
-  };
-
-  const handleDeleteUser = async (id) => {
-    try {
-      await apiClient.delete(`/users/${id}`, { withCredentials: true });
-      setUsers(users.filter((user) => user._id !== id));
-      setSnackbar({ open: true, message: "User deleted successfully", severity: "success" });
-    } catch (error) {
-      setSnackbar({ open: true, message: "Failed to delete user", severity: "error" });
-    } finally {
-      setDeleteConfirmation({ open: false, userId: null });
-    }
-  };
-
-  const handleEditEmail = (user) => {
-    setEditDialog({ open: true, user, newEmail: user.email });
-  };
-
-  const handleSaveEmail = async () => {
-    try {
-      const { user, newEmail } = editDialog;
-      const response = await apiClient.put(`/users/${user._id}/email`, { email: newEmail }, { withCredentials: true });
-      setUsers(users.map((u) => (u._id === user._id ? response.data : u)));
-      setSnackbar({ open: true, message: "Email updated successfully", severity: "success" });
-      setEditDialog({ open: false, user: null, newEmail: "" });
-    } catch (error) {
-      setSnackbar({ open: true, message: "Failed to update email", severity: "error" });
-    }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
-  const filteredUsers = users.filter((user) =>
-    user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-4xl font-semibold mb-6">Users List</h1>
-
-      <button
-        onClick={() => setOpenDialog(true)}
-        className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
-      >
-        Add User
-      </button>
-
-      {/* Search bar */}
-      <div className="my-6">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      {loading ? (
-        <div className="text-center text-xl text-blue-500">Loading...</div>
-      ) : (
-        <div className="overflow-x-auto bg-white shadow-lg rounded-lg border border-gray-200">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-blue-100">
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Full Name</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Profile Picture</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <tr key={user._id} className="border-b hover:bg-gray-50 transition-all">
-                    <td className="px-6 py-4">{user.fullName}</td>
-                    <td className="mx-auto px-6 py-7 flex justify-between items-center w-full">
-                      {user.email}
-                      <button
-                        onClick={() => handleEditEmail(user)}
-                        className="text-blue-500 hover:text-blue-700 transition-all text-xl"
-                      >
-                        <CiEdit />
-                      </button>
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.profilePic ? (
-                        <img src={user.profilePic} alt="Profile" className="w-12 h-12 rounded-full" />
-                      ) : (
-                        <FaUser className="w-12 h-12 text-gray-500 rounded-full" />
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => setDeleteConfirmation({ open: true, userId: user._id })}
-                        className="text-red-500 hover:text-red-700 transition-all"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No users found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {deleteConfirmation.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Confirm Deletion</h3>
-            <p>Are you sure you want to delete this user?</p>
-            <div className="flex justify-end gap-4 mt-4">
-              <button
-                onClick={() => setDeleteConfirmation({ open: false, userId: null })}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDeleteUser(deleteConfirmation.userId)}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add New User Dialog */}
-      {openDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Add New User</h3>
-            <input
-              type="text"
-              placeholder="Email"
-              name="email"
-              value={newUser.email}
-              onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-            />
-            <input
-              type="text"
-              placeholder="Full Name"
-              name="fullName"
-              value={newUser.fullName}
-              onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={newUser.password}
-              onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-              readOnly
-            />
-            <input
-              type="text"
-              placeholder="Profile Picture URL"
-              name="profilePic"
-              value={newUser.profilePic}
-              onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-              readOnly
-            />
-            <select
-              name="deleteOption"
-              value={newUser.deleteOption}
-              onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-            >
-              <option value="off">Off</option>
-              <option value="1 day">1 Day</option>
-              <option value="7 days">7 Days</option>
-              <option value="1 month">1 Month</option>
-            </select>
-            <div className="flex justify-end gap-4 mt-4">
-              <button
-                onClick={() => {
-                  setOpenDialog(false); 
-                  setNewUser({ email: "", fullName: "", password: "", profilePic: "", deleteOption: "off" });
-                }}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateUser}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
-              >
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Email Dialog */}
-      {editDialog.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Edit Email</h3>
-            <input
-              type="email"
-              placeholder="New Email"
-              value={editDialog.newEmail}
-              onChange={(e) => setEditDialog({ ...editDialog, newEmail: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-            />
-            <div className="flex justify-end gap-4 mt-4">
-              <button
-                onClick={() => setEditDialog({ open: false, user: null, newEmail: "" })}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEmail}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Snackbar */}
-      {snackbar.open && (
-        <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-md text-white ${snackbar.severity === "success" ? "bg-green-500" : "bg-red-500"}`}>
-          {snackbar.message}
-        </div>
-      )}
-    </div>
-  );
+  } catch (error) {
+    console.error('Error fetching location from ip-api.com:', error);
+    return null;
+  }
 };
 
-export default UsersList;
+const getAdminStats = async (req, res) => {
+  try {
+    const { 
+      newUsersTimeRange = '7d', 
+      loggedInUsersTimeRange = '7d', 
+      onemessagesTimeRange = '7d', 
+      manymessagesTimeRange = '7d' 
+    } = req.query;
+
+    // Helper function to calculate start date based on time range
+    const getStartDate = (timeRange) => {
+      const startDate = new Date();
+      switch (timeRange) {
+        case '7d':
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case '1m':
+          startDate.setMonth(startDate.getMonth() - 1);
+          break;
+        case '3m':
+          startDate.setMonth(startDate.getMonth() - 3);
+          break;
+        case '6m':
+          startDate.setMonth(startDate.getMonth() - 6);
+          break;
+        case '1y':
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          break;
+        default:
+          startDate.setDate(startDate.getDate() - 7); // Default to last 7 days
+      }
+      startDate.setHours(0, 0, 0, 0);
+      return startDate;
+    };
+
+    const newUsersStartDate = getStartDate(newUsersTimeRange);
+    const loggedInUsersStartDate = getStartDate(loggedInUsersTimeRange);
+    const oneMessagesStartDate = getStartDate(onemessagesTimeRange);
+    const manyMessagesStartDate = getStartDate(manymessagesTimeRange);
+
+    const totalUsers = await User.countDocuments();
+    const totalMessages = await Message.countDocuments();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const newUsersToday = await User.countDocuments({ createdAt: { $gte: today } });
+    const activeUsersToday = await User.countDocuments({ updatedAt: { $gte: today } });
+
+    // Get user growth (new users) over the selected time range
+    const userGrowth = await User.aggregate([
+      {
+        $match: { createdAt: { $gte: newUsersStartDate } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Get login activity (users who logged in) over the selected time range
+    const loginActivity = await User.aggregate([
+      {
+        $match: { updatedAt: { $gte: loggedInUsersStartDate } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Get one-to-one messages over the selected time range
+    const oneToOneMessages = await Message.aggregate([
+      {
+        $match: { createdAt: { $gte: oneMessagesStartDate }, groupId: { $exists: false } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Get one-to-many messages over the selected time range
+    const oneToManyMessages = await Message.aggregate([
+      {
+        $match: { createdAt: { $gte: manyMessagesStartDate }, groupId: { $exists: true } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    const latestUsers = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .select('profilePic fullName email createdAt');
+
+    // Fetch user session data with user details
+    const userSessionData = await SessionUser.aggregate([
+      {
+        $lookup: {
+          from: 'users', // Join with the User collection
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userDetails'
+        }
+      },
+      {
+        $unwind: '$userDetails'
+      },
+      {
+        $project: {
+          _id: 0,
+          sessionId: 1,
+          ipAddress: 1,
+          createdAt: 1,
+          'userDetails.profilePic': 1,
+          'userDetails.fullName': 1,
+          type: { $literal: 'user' } // Add a type field to distinguish user sessions
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+
+    // Fetch admin session data with admin details
+    const adminSessionData = await SessionAdmin.aggregate([
+      {
+        $lookup: {
+          from: 'admins', // Join with the Admin collection
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'adminDetails'
+        }
+      },
+      {
+        $unwind: '$adminDetails'
+      },
+      {
+        $project: {
+          _id: 0,
+          sessionId: 1,
+          ipAddress: 1,
+          createdAt: 1,
+          'adminDetails.profilePic': 1,
+          'adminDetails.fullName': 1,
+          type: { $literal: 'admin' } // Add a type field to distinguish admin sessions
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+
+    // Combine user and admin session data
+    const combinedSessionData = [...userSessionData, ...adminSessionData];
+
+    // Add location data to combined session data
+    const sessionDataWithLocation = await Promise.all(
+      combinedSessionData.map(async (session) => {
+        const location = await getLocationFromIP(session.ipAddress);
+        // console.log(location);
+        return {
+          ...session,
+          userDetails: session.userDetails || { profilePic: '', fullName: 'Unknown User' },
+          adminDetails: session.adminDetails || { profilePic: '', fullName: 'Unknown Admin' },
+          location: location ? `${location.city}, ${location.regionName}, ${location.country}` : 'Unknown',
+          coordinates: location ? [location.lat, location.lon] : null, // Latitude and longitude
+          isp: location ? location.isp : 'Unknown',
+          org: location ? location.org : 'Unknown',
+          timezone: location ? location.timezone : 'Unknown',
+        };
+      })
+    );
+
+    res.status(200).json({
+      totalUsers,
+      totalMessages,
+      newUsersToday,
+      activeUsersToday,
+      userGrowth,
+      loginActivity,
+      oneToOneMessages,
+      oneToManyMessages,
+      latestUsers,
+      sessionData: sessionDataWithLocation, // Include combined session data with location
+    });
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export { getAdminStats };
