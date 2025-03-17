@@ -76,6 +76,11 @@ const OpenLayersMapComponent = ({ locations, className }) => {
         map.addOverlay(marker);
       });
 
+      // Add click event to the map to close the popup
+      map.on("click", (event) => {
+        setSelectedLocation(null); // Hide the popup
+      });
+
       // Cleanup on unmount
       return () => {
         map.setTarget(undefined);
@@ -140,4 +145,4 @@ const OpenLayersMapComponent = ({ locations, className }) => {
   );
 };
 
-export default OpenLayersMapComponent;
+export default OpenLayersMapComponent;  
