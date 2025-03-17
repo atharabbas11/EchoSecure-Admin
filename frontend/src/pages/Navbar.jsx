@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../utils/apiClient';
 import { useAuth } from '../utils/AuthContext';
 import { FaBars, FaHome, FaUser, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa';
+import eslogo from '../images/eslogo.png';
 
 const Navbar = () => {
   const { isAuthenticated, setIsAuthenticated } = useAuth();
@@ -42,9 +43,14 @@ const Navbar = () => {
               <FaBars />
             </button>
 
-            <Link to="/" className="text-2xl font-bold text-white">
-              EchoSecure
-            </Link>
+            <div className="flex items-center gap-8">
+              <Link to="/" className="flex items-center gap-2.5 hover:opacity-80 transition-all">
+                <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
+                  <img src={eslogo} alt="EchoSecure Logo" className="mt-2 w-16 h-16 object-cover" />
+                </div>
+                <h1 className="text-lg font-bold">EchoSecure</h1>
+              </Link>
+            </div>
 
             <div className="hidden md:flex gap-4 items-center">
               {menuItems.map((item, index) =>
@@ -82,7 +88,7 @@ const Navbar = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-12">
               {menuItems.map((item, index) => (
                 <div key={index}>
                   {item.action ? (
