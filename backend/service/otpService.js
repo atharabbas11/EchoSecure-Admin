@@ -104,11 +104,13 @@ export const sendPasswordSetupEmail = async (email, fullName, link) => {
           <p style="font-size: 16px; color: #333;">Dear ${fullName},</p>
           <p style="font-size: 16px; color: #333;">Your New account is cerated please set your password for EchoSecure ChatApp.</p>
           <p style="font-size: 16px; color: #333;">Please click the link below to set your new password:</p>
-          <div style="margin: 20px 0;">
-            <span style="display: inline-block; overflow-hidden; font-size: 13px; font-weight: bold; background: #f5f5f5; padding: 10px 20px; border-radius: 5px; border: 1px solid #ccc;">
-              <a href=${link} style="text-decoration: none; color: #007bff;">Set Password Link</a>
-            </span>
-          </div>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width: auto; border: 0; border-radius: 5px; background: #f5f5f5; padding: 10px 20px; text-align: center; font-size: 13px; font-weight: bold;">
+            <tr>
+              <td style="border: 1px solid #ccc; border-radius: 5px; background: #f5f5f5;">
+                <a href="${link}" style="text-decoration: none; color: #007bff; display: inline-block; padding: 10px 20px; border-radius: 5px; background-color: #f5f5f5; border: 1px solid #ccc;">Set Password Link</a>
+              </td>
+            </tr>
+          </table>
           <p style="font-size: 16px; color: #333;">If you did not request this, please ignore this email or contact support.</p>
           <p style="font-size: 14px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 10px;">
             EchoSecure Chat | All rights reserved
