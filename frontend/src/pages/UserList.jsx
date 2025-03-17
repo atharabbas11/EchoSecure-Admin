@@ -25,6 +25,18 @@ const UsersList = () => {
     fetchUsers();
   }, []);
 
+   // Auto-close snackbar after 5 seconds
+  useEffect(() => {
+    if (snackbar.open) {
+      const timer = setTimeout(() => {
+        setSnackbar({ ...snackbar, open: false });
+      }, 5000); // 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [snackbar.open]);
+
+
   const fetchUsers = async () => {
     try {
       const response = await apiClient.get("/users", { withCredentials: true });
