@@ -43,10 +43,14 @@ export const sendOTPEmail = async (email, otp) => {
     html:`
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;">
         <!-- Logo Section -->
-        <div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 16px;">
-          <div style="width: 64px; height: 64px; border-radius: 8px; background-color: rgba(0, 0, 255, 0.1); display: flex; justify-content: center; align-items: center; overflow: hidden;">
-            <img src="https://raw.githubusercontent.com/atharabbas11/EchoSecure-Admin/refs/heads/main/frontend/src/images/eslogo.png" alt="Government Logo" width="75" style="display: block; margin: auto;">
-          </div>
+        <div style="margin-bottom: 20px;">
+          <table role="presentation" style="margin: 0 auto;">
+            <tr>
+              <td style="width: 64px; height: 64px; border-radius: 8px; background-color: rgba(0, 0, 255, 0.1); display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                <img src="https://raw.githubusercontent.com/atharabbas11/EchoSecure-Admin/refs/heads/main/frontend/src/images/eslogo.png" alt="Government Logo" width="65" style="display: block; margin: auto;">
+              </td>
+            </tr>
+          </table>
         </div>
         <h2 style="color: #0056b3; margin-bottom: 10px;">EchoSeucre</h2>
         <p style="font-size: 16px; color: #333;">Dear Admin,</p>
@@ -102,10 +106,14 @@ export const sendPasswordSetupEmail = async (email, fullName, link) => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;">
           <!-- Logo Section -->
-          <div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 16px;">
-            <div style="width: 64px; height: 64px; border-radius: 8px; background-color: rgba(0, 0, 255, 0.1); display: flex; justify-content: center; align-items: center; overflow: hidden;">
-              <img src="https://raw.githubusercontent.com/atharabbas11/EchoSecure-Admin/refs/heads/main/frontend/src/images/eslogo.png" alt="Government Logo" width="75" style="display: block; margin: auto;">
-            </div>
+          <div style="margin-bottom: 20px;">
+            <table role="presentation" style="margin: 0 auto;">
+              <tr>
+                <td style="width: 64px; height: 64px; border-radius: 8px; background-color: rgba(0, 0, 255, 0.1); display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                  <img src="https://raw.githubusercontent.com/atharabbas11/EchoSecure-Admin/refs/heads/main/frontend/src/images/eslogo.png" alt="Government Logo" width="65" style="display: block; margin: auto;">
+                </td>
+              </tr>
+            </table>
           </div>
           <h2 style="color: #0056b3; margin-bottom: 10px;">EchoSecure Chat</h2>
           <p style="font-size: 16px; color: #333;">Dear ${fullName},</p>
