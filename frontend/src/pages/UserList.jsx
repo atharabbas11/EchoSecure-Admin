@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import apiClient from "../utils/apiClient";
 import { FaUser } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
+import AnimatedLogo from './AniLogo';
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +15,8 @@ const UsersList = () => {
     deleteOption: "off",
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState({ open: false, userId: null });
   const [searchTerm, setSearchTerm] = useState("");
   const [editDialog, setEditDialog] = useState({ open: false, user: null, newEmail: "" }); // State for edit dialog
@@ -24,7 +26,6 @@ const UsersList = () => {
   }, []);
 
   const fetchUsers = async () => {
-    setLoading(true);
     try {
       const response = await apiClient.get("/users", { withCredentials: true });
       setUsers(response.data);
@@ -34,6 +35,10 @@ const UsersList = () => {
       setLoading(false);
     }
   };
+
+  if (loading) return <AnimatedLogo />;
+
+  if (error) return <div className="text-red-500">{error}</div>;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -93,10 +98,7 @@ const UsersList = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-4xl font-semibold mb-6">Users List</h1>
 
-      <button
-        onClick={() => setOpenDialog(true)}
-        className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
-      >
+      <button onClick={() => setOpenDialog(true)} className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all">
         Add User
       </button>
 
@@ -112,7 +114,8 @@ const UsersList = () => {
       </div>
 
       {loading ? (
-        <div className="text-center text-xl text-blue-500">Loading...</div>
+        <div></div>
+        // <AnimatedLogo />
       ) : (
         <div className="overflow-x-auto bg-white shadow-lg rounded-lg border border-gray-200">
           <table className="min-w-full table-auto">
