@@ -59,7 +59,7 @@ const createUser = async (req, res) => {
 
     // Send email with password setup link
     const passwordSetupLink = `${ECHOSECURE_CLIENT_URL}/set-password?token=${passwordSetupToken}`;
-    await sendPasswordSetupEmail(email, passwordSetupLink);
+    await sendPasswordSetupEmail(email, fullName, passwordSetupLink);
 
     res.status(201).json({
       _id: newUser._id,
