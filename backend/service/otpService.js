@@ -115,7 +115,7 @@ export const sendPasswordSetupEmail = async (email, fullName, link) => {
               </tr>
             </table>
           </div>
-          <h2 style="color: #0056b3; margin-bottom: 10px;">EchoSecure Chat</h2>
+          <h2 style="color: #0056b3; margin-bottom: 10px;">EchoSecure</h2>
           <p style="font-size: 16px; color: #333;">Dear ${fullName},</p>
           <p style="font-size: 16px; color: #333;">Your New account is cerated please set your password for EchoSecure ChatApp.</p>
           <p style="font-size: 16px; color: #333;">Please click the link below to set your new password:</p>
