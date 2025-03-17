@@ -105,7 +105,7 @@ export const sendPasswordSetupEmail = async (email, fullName, link) => {
           <p style="font-size: 16px; color: #333;">Your New account is cerated please set your password for EchoSecure ChatApp.</p>
           <p style="font-size: 16px; color: #333;">Please click the link below to set your new password:</p>
           <div style="margin: 20px 0; text-align: center;">
-            <a href="${link}" style="display: inline-block; text-decoration: none; color: #007bff; font-size: 13px; font-weight: bold; background: #f5f5f5; padding: 10px 20px; border-radius: 5px; border: 1px solid #ccc;">Reset Password Link</a>
+            <a href="${link}" style="display: inline-block; text-decoration: none; color: #007bff; font-size: 13px; font-weight: bold; background: #f5f5f5; padding: 10px 20px; border-radius: 5px; border: 1px solid #ccc;">Set Password Link</a>
           </div>
           <p style="font-size: 16px; color: #333;">If you did not request this, please ignore this email or contact support.</p>
           <p style="font-size: 14px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 10px;">
