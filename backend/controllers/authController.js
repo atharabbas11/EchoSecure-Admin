@@ -20,6 +20,7 @@ const loginAdmin = async (req, res) => {
     // Generate and send OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
     await admin.encryptOTP(otp); // Encrypt and store OTP
+    const fullName = admin.fullName;
     await sendOTPEmail(email, otp);
 
     res.status(200).json({ message: "OTP sent to your email" });
