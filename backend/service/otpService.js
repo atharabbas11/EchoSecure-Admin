@@ -26,7 +26,7 @@ export const verifyOTP = (email, otp) => {
 };
 
 // Send OTP via email
-export const sendOTPEmail = async (email, otp) => {
+export const sendOTPEmail = async (email, fullName, otp) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -53,7 +53,7 @@ export const sendOTPEmail = async (email, otp) => {
           </table>
         </div>
         <h2 style="color: #0056b3; margin-bottom: 10px;">EchoSeucre</h2>
-        <p style="font-size: 16px; color: #333;">Dear Admin,</p>
+        <p style="font-size: 16px; color: #333;">Dear ${fullName},</p>
         <p style="font-size: 16px; color: #333;">Your One-Time Password (OTP) for secure login is:</p>
         <!-- OTP Box -->
         <div style="margin: 20px 0;">
