@@ -4,18 +4,37 @@ import User from '../models/userModel.js';
 import Admin from '../models/adminModel.js';
 import Message from '../models/messageModel.js';
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Replace with your ipinfo.io token
+const IPINFO_TOKEN =  process.env.IPINFO_TOKEN;
 
 const getLocationFromIP = async (ip) => {
   try {
-    const response = await axios.get(`http://ip-api.com/json/${ip}?fields=status,message,continent,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`);
-    if (response.data.status === 'success') {
-      return response.data;
+    // Fetch location data from ipinfo.io
+    const response = await axios.get(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
+    if (response.data) {
+      const { city, region, country, loc, org, timezone, postal } = response.data;
+      return {
+        city,
+        regionName: region,
+        country,
+        lat: loc ? loc.split(',')[0] : null, // Extract latitude from "loc"
+        lon: loc ? loc.split(',')[1] : null, // Extract longitude from "loc"
+        isp: org,
+        org,
+        timezone,
+        postal,
+      };
     } else {
-      console.error(`Error from ip-api.com: ${response.data.message}`);
+      console.error('No data received from ipinfo.io');
       return null;
     }
   } catch (error) {
-    console.error('Error fetching location from ip-api.com:', error);
+    console.error('Error fetching location from ipinfo.io:', error);
     return null;
   }
 };
@@ -203,7 +222,6 @@ const getAdminStats = async (req, res) => {
     const sessionDataWithLocation = await Promise.all(
       combinedSessionData.map(async (session) => {
         const location = await getLocationFromIP(session.ipAddress);
-        // console.log(location);
         return {
           ...session,
           userDetails: session.userDetails || { profilePic: '', fullName: 'Unknown User' },
