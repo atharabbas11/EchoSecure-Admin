@@ -22,7 +22,7 @@ const App = () => {
       <ErrorBoundary>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+{/*           <Route path="/signup" element={<Signup />} /> */}
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/users" element={<ProtectedRoute><UsersList /></ProtectedRoute>} />
         </Routes>
